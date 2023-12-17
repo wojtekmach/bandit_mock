@@ -1,0 +1,2 @@
+defmodule BanditMock do
+end
