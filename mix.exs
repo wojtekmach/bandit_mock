@@ -19,7 +19,9 @@ defmodule BanditMock.MixProject do
 
   defp deps do
     [
-      {:bandit, "~> 1.0"}
+      {:bandit, "~> 1.0"},
+      {:mox, "~> 1.0"},
+      {:req, "~> 0.4", only: :test}
     ]
   end
 end
