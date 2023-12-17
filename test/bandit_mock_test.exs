@@ -24,19 +24,17 @@ defmodule BanditMockTest do
       assert Req.get!(BanditMock.base_url(test)).body == "hi"
     end)
   end
-
-  test "README" do
-    [_, "elixir\n" <> code, _] = File.read!("README.md") |> String.split("```")
-    {:ok, quoted} = Code.string_to_quoted(code)
-
-    quoted
-    |> Macro.prewalk(fn
-      {{:., _, [{:__aliases__, _, [:Mix]}, :install]}, _, _} ->
-        :ok
-
-      other ->
-        other
-    end)
-    |> Code.eval_quoted()
-  end
 end
+
+[_, "elixir\n" <> code, _] = File.read!("README.md") |> String.split("```")
+{:ok, quoted} = Code.string_to_quoted(code)
+
+quoted
+|> Macro.prewalk(fn
+  {{:., _, [{:__aliases__, _, [:Mix]}, :install]}, _, _} ->
+    :ok
+
+  other ->
+    other
+end)
+|> Code.eval_quoted()
