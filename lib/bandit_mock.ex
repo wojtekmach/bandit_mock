@@ -33,7 +33,7 @@ defmodule BanditMock do
   end
 
   defp mock_name(name) do
-    Module.concat(Bandit.Mocks, name)
+    Module.concat(BanditMock.Mocks, name)
   end
 end
 
