@@ -1,7 +1,5 @@
 defmodule BanditMock do
-  def defmock(name) do
-    Mox.defmock(mock_name(name), for: BanditMock.API)
-  end
+  def defmock(name), do: Mox.defmock(mock_name(name), for: BanditMock.API)
 
   def base_url(name) do
     ensure_mock!(name).base_url()
@@ -24,17 +22,12 @@ defmodule BanditMock do
 
   defp ensure_mock!(name) do
     case Code.ensure_compiled(mock_name(name)) do
-      {:module, mod} ->
-        mod
-
-      {:error, _} ->
-        raise "unknown mock #{inspect(name)}"
+      {:module, mod} -> mod
+      {:error, _} -> raise "unknown mock #{inspect(name)}"
     end
   end
 
-  defp mock_name(name) do
-    Module.concat(BanditMock.Mocks, name)
-  end
+  defp mock_name(name), do: Module.concat(BanditMock.Mocks, name)
 end
 
 defmodule BanditMock.Plug do
