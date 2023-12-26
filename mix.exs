@@ -13,14 +13,14 @@ defmodule BanditMock.MixProject do
 
   def application do
     [
-      extra_applications: [:logger]
+      mod: {BanditMock.Application, []}
     ]
   end
 
   defp deps do
     [
       {:bandit, "~> 1.0"},
-      {:mox, "~> 1.0"},
+      {:nimble_ownership, "~> 0.1.0"},
       {:req, "~> 0.4", only: :test}
     ]
   end

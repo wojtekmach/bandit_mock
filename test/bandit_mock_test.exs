@@ -2,14 +2,8 @@ defmodule BanditMockTest do
   use ExUnit.Case, async: true
 
   test "it works", %{test: test} do
-    assert_raise RuntimeError, "unknown mock #{inspect(test)}", fn ->
-      BanditMock.base_url(test)
-    end
-
-    BanditMock.defmock(test)
-
     assert_raise RuntimeError,
-                 "no stub defined for mock #{inspect(test)} in process #{inspect(self())}",
+                 "no stub defined for #{inspect(test)} in process #{inspect(self())}",
                  fn ->
                    BanditMock.base_url(test)
                  end
@@ -23,6 +17,7 @@ defmodule BanditMockTest do
     Task.async(fn ->
       assert Req.get!(BanditMock.base_url(test)).body == "hi"
     end)
+    |> Task.await()
   end
 end
 

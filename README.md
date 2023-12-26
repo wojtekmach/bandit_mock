@@ -12,8 +12,6 @@ defmodule GitHub do
   if Application.compile_env(:github, :mock, false) do
     @mock __MODULE__.Mock
 
-    BanditMock.defmock(@mock)
-
     def stub(fun), do: BanditMock.stub(@mock, fun)
 
     def api_token, do: "dummy"

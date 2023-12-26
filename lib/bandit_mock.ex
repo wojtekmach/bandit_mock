@@ -1,11 +1,27 @@
-defmodule BanditMock do
-  def defmock(name), do: Mox.defmock(mock_name(name), for: BanditMock.API)
+defmodule BanditMock.Application do
+  @moduledoc false
+  use Application
 
+  @impl true
+  def start(_type, _args) do
+    children = [{NimbleOwnership, name: BanditMock.Ownership}]
+    Supervisor.start_link(children, strategy: :one_for_one)
+  end
+end
+
+defmodule BanditMock do
   def base_url(name) do
-    ensure_mock!(name).base_url()
-  rescue
-    Mox.UnexpectedCallError ->
-      raise "no stub defined for mock #{inspect(name)} in process #{inspect(self())}"
+    callers =
+      case Process.get(:"$callers") do
+        nil -> [self()]
+        pids when is_list(pids) -> pids
+      end
+
+    if info = NimbleOwnership.get_owner(BanditMock.Ownership, callers, name) do
+      Map.fetch!(info.metadata, :base_url)
+    else
+      raise "no stub defined for #{inspect(name)} in process #{inspect(self())}"
+    end
   end
 
   def stub(name, plug) do
@@ -16,23 +32,13 @@ defmodule BanditMock do
 
     {:ok, {_, port}} = ThousandIsland.listener_info(pid)
     base_url = "http://localhost:#{port}"
-    Mox.stub(ensure_mock!(name), :base_url, fn -> base_url end)
+    :ok = NimbleOwnership.allow(BanditMock.Ownership, self(), self(), name, %{base_url: base_url})
     :ok
   end
-
-  defp ensure_mock!(name) do
-    case Code.ensure_compiled(mock_name(name)) do
-      {:module, mod} -> mod
-      {:error, _} -> raise "unknown mock #{inspect(name)}"
-    end
-  end
-
-  defp mock_name(name), do: Module.concat(BanditMock.Mocks, name)
 end
 
 defmodule BanditMock.Plug do
   @moduledoc false
-
   @behaviour Plug
 
   @impl true
@@ -40,10 +46,4 @@ defmodule BanditMock.Plug do
 
   @impl true
   def call(conn, plug), do: plug.(conn)
-end
-
-defmodule BanditMock.API do
-  @moduledoc false
-
-  @callback base_url() :: String.t()
 end
